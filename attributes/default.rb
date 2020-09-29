@@ -4,7 +4,7 @@ include_attribute "ndb"
 include_attribute "kzookeeper"
 
 default['hops']['versions']                    = "2.8.2.2,2.8.2.3,2.8.2.4,2.8.2.5,2.8.2.6,2.8.2.7,2.8.2.8,2.8.2.9,2.8.2.10"
-default['hops']['version']                     = "3.2.0.0-SNAPSHOT"
+default['hops']['version']                     = "3.2.0.0-RC3"
 
 default['hops']['hdfs']['user']                = node['install']['user'].empty? ? "hdfs" : node['install']['user']
 default['hops']['hdfs']['user-home']           = "/home/#{node['hops']['hdfs']['user']}"
@@ -94,7 +94,7 @@ default['hops']['io_buffer_sz']                = 131072
 default['hops']['container_cleanup_delay_sec'] = 0
 
 default['hops']['nn']['replace-dn-on-failure']        = true
-default['hops']['nn']['replace-dn-on-failure-policy'] = "DEFAULT" 
+default['hops']['nn']['replace-dn-on-failure-policy'] = "NEVER" 
 
 default['hops']['yarn']['scripts']             = %w{ start stop restart }
 default['hops']['yarn']['ps_port']             = 20888
@@ -446,6 +446,7 @@ default['hops']['nn']['enable_retrycache']            = "true"
 
 default['hops']['hdfs']['quota_enabled']              = "true"
 default['hops']['nn']['handler_count']                = 120
+default['hops']['nn']['subtree-executor-limit']       = 40
 
 default['hops']['gcp_url']                            = node['hops']['root_url'] + "/gcs-connector-hadoop2-latest.jar"
 
@@ -464,14 +465,15 @@ default['hops']['docker']['enabled']                  = "true"
 default['hops']['docker_version']['ubuntu']           = "19.03.6-0ubuntu1~18.04.1"
 default['hops']['docker_version']['centos']           = "19.03.8-3"
 default['hops']['selinux_version']['centos']          = "2.119.1-1.c57a6f9"
-default['hops']['containerd_version']['centos']           = "1.2.13-3.1"
+default['hops']['containerd_version']['centos']       = "1.2.13-3.1"
 default['hops']['docker_img_version']                 = node['install']['version']
 default['hops']['docker_dir']                         = node['install']['dir'].empty? ? "/var/lib/docker" : "#{node['install']['dir']}/docker"
-default['hops']['docker']['trusted-registers']        = "local"
+default['hops']['docker']['trusted_registries']       = ""
 default['hops']['docker']['mounts']                   = "#{node['hops']['conf_dir']},#{node['hops']['dir']}/spark,#{node['hops']['dir']}/flink,#{node['hops']['dir']}/apache-livy"
-default['hops']['docker']['base']['name']             = "python36"
-default['hops']['docker']['base']['python']           = "3.6"
-default['hops']['docker']['base']['download_url']     = "#{node['download_url']}/kube/docker-images/#{node['hops']['docker_img_version']}/#{node['hops']['docker']['base']['name']}.tar"
+default['hops']['docker']['base']['image']['name']           = "base"
+default['hops']['docker']['base']['image']['python']['name']  = "python36"
+default['hops']['docker']['base']['image']['python']['version'] = "3.6"
+default['hops']['docker']['base']['download_url']     = "#{node['download_url']}/kube/docker-images/#{node['hops']['docker_img_version']}/base.tar"
 default['hops']['cgroup-driver']                      = "cgroupfs"
 default['hops']['docker']['registry']['port']         = 4443
 default['hops']['docker']['registry']['download_url'] = "#{node['download_url']}/kube/docker-images/#{node['hops']['docker_img_version']}/registry_image.tar"
@@ -482,3 +484,6 @@ default['hops']['nvidia_pkgs']['download_url']        ="#{node['download_url']}/
 default['hops']['xattrs']['enabled']                  = "true"
 default['hops']['xattrs']['max-xattrs-per-inode']     = 32
 default['hops']['xattrs']['max-xattr-size']           = 1039755
+
+#ACL
+default['hops']['acl']['enabled']                     = "true"

@@ -70,7 +70,7 @@ key_name = x509_helper.get_private_key_pkcs8_name(node['kagent']['user'])
 bash "start_docker_registry" do
   user "root"
   code <<-EOF
-   docker run -d --restart=always --name registry -v #{kagent_crypto_dir}:/certs -e REGISTRY_HTTP_ADDR=0.0.0.0:443 -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/#{certificate_name} -e REGISTRY_HTTP_TLS_KEY=/certs/#{key_name} -p #{node['hops']['docker']['registry']['port']}:443 registry
+   docker run -d --restart=always --name registry -v #{kagent_crypto_dir}:/certs -e REGISTRY_STORAGE_DELETE_ENABLED=true -e REGISTRY_HTTP_ADDR=0.0.0.0:443 -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/#{certificate_name} -e REGISTRY_HTTP_TLS_KEY=/certs/#{key_name} -p #{node['hops']['docker']['registry']['port']}:443 registry
    EOF
   not_if "docker container inspect registry"
 end
@@ -102,44 +102,50 @@ image_url = node['hops']['docker']['base']['download_url']
 base_filename = File.basename(image_url)
 download_command = " wget #{image_url}"
 
+registry_address = "#{registry_host}:#{node['hops']['docker']['registry']['port']}"
+base_image = "#{node['hops']['docker']['base']['image']['name']}:#{node['hops']['docker_img_version']}"
+base_image_python = "#{node['hops']['docker']['base']['image']['python']['name']}:#{node['hops']['docker_img_version']}"
+
 if node['install']['enterprise']['install'].casecmp? "true"
   image_url ="#{node['install']['enterprise']['download_url']}/docker-tars/#{node['hops']['docker_img_version']}/#{base_filename}"
   download_command = " wget --user #{node['install']['enterprise']['username']} --password #{node['install']['enterprise']['password']} #{image_url}"
 end
 
-bash "download_image" do
+bash "download_images" do
   user "root"
   sensitive true
   code <<-EOF
        #{download_command} -O #{Chef::Config['file_cache_path']}/#{base_filename}
   EOF
   not_if { File.exist? "#{Chef::Config['file_cache_path']}/#{base_filename}" }
-  not_if "docker image inspect #{registry_host}:#{node['hops']['docker']['registry']['port']}/#{node['hops']['docker']['base']['name']}:#{node['install']['version']}"
+  not_if "docker image inspect #{registry_address}/#{base_image} #{registry_address}/#{base_image_python}"
 end
 
-#import docker image
-bash "import_image" do
+#import docker base image
+bash "import_images" do
   user "root"
   code <<-EOF
     docker load -i #{Chef::Config['file_cache_path']}/#{base_filename}
   EOF
-  not_if "docker image inspect #{registry_host}:#{node['hops']['docker']['registry']['port']}/#{node['hops']['docker']['base']['name']}:#{node['install']['version']}"
+  not_if "docker image inspect #{registry_address}/#{base_image} #{registry_address}/#{base_image_python}"
 end
 
-#tag image
-bash "tag_image" do
+bash "tag_images" do
   user "root"
   code <<-EOF
-    docker tag #{node['hops']['docker']['base']['name']} #{registry_host}:#{node['hops']['docker']['registry']['port']}/#{node['hops']['docker']['base']['name']}:#{node['install']['version']}
+    docker tag #{base_image} #{registry_address}/#{base_image}
+    docker rmi #{base_image}
+    docker tag #{base_image_python} #{registry_address}/#{base_image_python}
+    docker rmi #{base_image_python}
   EOF
-  not_if "docker image inspect #{registry_host}:#{node['hops']['docker']['registry']['port']}/#{node['hops']['docker']['base']['name']}:#{node['install']['version']}"
+  not_if "docker image inspect #{registry_address}/#{base_image} #{registry_address}/#{base_image_python}"
 end
 
-#push image to registry
-bash "push_image" do
+bash "push_images" do
   user "root"
   code <<-EOF
-    docker push #{registry_host}:#{node['hops']['docker']['registry']['port']}/#{node['hops']['docker']['base']['name']}:#{node['install']['version']}
+    docker push #{registry_address}/#{base_image}
+    docker push #{registry_address}/#{base_image_python}
   EOF
 end
 

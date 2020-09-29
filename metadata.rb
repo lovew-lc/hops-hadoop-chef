@@ -4,7 +4,7 @@ maintainer_email "jdowling@kth.se"
 license          "Apache v2.0"
 description      'Installs/Configures the Hops distribution'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          "1.4.0"
+version          "2.0.0"
 source_url       "https://github.com/hopshadoop/hops-hadoop-chef"
 
 
@@ -693,7 +693,7 @@ attribute "hops/nn/root_dir_storage_policy",
           :type => "string"
 
 attribute "hops/retry_policy_spec",
-          :description => "Retry policy specification. For example '1.4.0,6,60000,10' means retry 6 times with 10 sec delay and then retry 10 times with 1 min delay.",
+          :description => "Retry policy specification. For example '2.0.0,6,60000,10' means retry 6 times with 10 sec delay and then retry 10 times with 1 min delay.",
           :type => "string"
 
 attribute "hops/retry_policy_enabled",
@@ -772,8 +772,8 @@ attribute "hops/docker_dir",
           :description =>  "Path on the host machine to be used to store docker containers,imgs,logs",
           :type => 'string'
 
-attribute "hops/docker/trusted-registers",
-          :description => "Trustested registers for docker images",
+attribute "hops/docker/trusted_registries",
+          :description => "Trusted registries to pull docker images for yarn (comma separated list host:port)",
           :type => 'string'
 
 attribute "hops/docker/mounts",
@@ -823,3 +823,11 @@ attribute "hops/xattrs/max-xattrs-per-inode",
 attribute "hops/xattrs/max-xattr-size",
           :description => "The maximum combined size of the name and value of an extended attribute in bytes. It should be larger than 0 and less than or equal to the maximum size (hard limit), which is 3442755. By default, this limit is 13755 bytes, where the name can take up to 255 bytes, and the value size can take up to 13500 bytes.",
           :type => "string"
+
+attribute "hops/acl/enabled",
+          :description =>  "enable acl support  Default: true",
+          :type => 'string'
+
+attribute "hops/nn/subtree-executor-limit",
+          :description =>  "size of the threadpool for subtree operations",
+          :type => 'string'
