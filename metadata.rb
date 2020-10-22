@@ -188,6 +188,14 @@ attribute "hops/yarn/container_executor",
           :description => "Container executor class",
           :type => 'string'
 
+attribute "hops/azure_connection_string",
+          :description => "Connection string to blob storage",
+          :type => 'string'
+
+attribute "hops/azure_blob_container",
+          :description => "Azure blob container to use with cloud storage",
+          :type => 'string'
+
 attribute "hops/trash/interval",
           :description => "How long in minutes trash survives in /user/<glassfish>/.Trash/<interval-bucket>/...",
           :type => "string"
