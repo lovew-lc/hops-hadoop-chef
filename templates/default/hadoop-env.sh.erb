@@ -289,6 +289,8 @@ fi
 # to keep HADOOP_IDENT_STRING untouched, then uncomment this line.
 # export HADOOP_SECURE_IDENT_PRESERVE="true"
 
+export AZURE_STORAGE_CONNECTION_STRING="<%= node['hops']['azure_connection_string'] %>"
+
 ###
 # NameNode specific parameters
 ###

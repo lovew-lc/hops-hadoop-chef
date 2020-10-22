@@ -531,6 +531,12 @@
 </property>
 
 <property>
+   <name>dfs.cloud.azure.container</name>
+   <value><%= node['hops']['azure_blob_container'] %></value>
+   <description>Hopsfs Azure blob container used to store file system blocks</description>
+</property>
+
+<property>
    <name>dfs.cloud.aws.s3.bucket</name>
    <value><%= node['hops']['aws_s3_bucket'] %></value>
    <description>Hopsfs S3 bucket used to store file system blocks</description>
